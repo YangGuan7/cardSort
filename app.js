@@ -5,8 +5,13 @@ const initialStock = {
   辰: 87,
   城: 83,
   菲: 83,
+<<<<<<< HEAD
   玟: 94,
   寅: 94
+=======
+  玟: 92,
+  寅: 92
+>>>>>>> 0b15c85 (072111)
 };
 
 const FULL_SET_MEMBERS = Object.keys(initialStock);

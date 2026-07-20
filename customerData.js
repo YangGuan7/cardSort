@@ -153,6 +153,15 @@ const customerData = [
     preferences: ["玟", "辰", "菲", "旻", "寅", "城", "彬", "燦"]
   },
   {
+<<<<<<< HEAD
+=======
+    id: "sarah",
+    need: 0,
+    fixedCards: [],
+    preferences: []
+  },
+  {
+>>>>>>> 0b15c85 (072111)
     id: "shao",
     need: 4,
     fixedCards: [],
@@ -219,6 +228,15 @@ const customerData = [
     preferences: ["城", "菲", "辰", "玟", "寅", "旻", "燦", "彬"]
   },
   {
+<<<<<<< HEAD
+=======
+    id: "Milu~",
+    need: 0,
+    fixedCards: [],
+    preferences: ["燦", "旻", "彬", "辰", "城", "菲", "玟", "寅"]
+  },
+  {
+>>>>>>> 0b15c85 (072111)
     id: "croissant",
     need: 2,
     fixedCards: [],
@@ -429,8 +447,13 @@ const customerData = [
     preferences: ["彬", "菲", "辰", "城", "旻", "燦", "寅","玟"]
   },
   {
+<<<<<<< HEAD
     id: "牛琦崴",
     need: 12,
+=======
+    id: "77",
+    need: 0,
+>>>>>>> 0b15c85 (072111)
     fixedCards: [],
     preferences: ["旻", "菲", "玟", "辰", "城", "寅", "燦", "彬"]
   },
