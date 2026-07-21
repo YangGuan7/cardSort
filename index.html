@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="依完整套組、填單順序與志願順位分配小卡庫存。" />
+  <title>小卡分配工具</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <main class="app">
+    <header class="hero">
+      <div class="hero__content">
+        <span class="hero__eyebrow">CARD DISTRIBUTION</span>
+        <h1>小卡分配工具</h1>
+        <p>
+          指定卡先分配；其餘需求每滿 8 張優先配套，除不盡的張數再依填單順序與志願順位輪流分配。
+        </p>
+      </div>
+
+      <div class="hero__info" aria-label="分配規則摘要">
+        <div class="hero__info-item">
+          <strong>8</strong>
+          <span>位成員</span>
+        </div>
+        <div class="hero__info-item">
+          <strong id="customerCount">0</strong>
+          <span>筆填單資料</span>
+        </div>
+      </div>
+    </header>
+
+    <section class="panel stock-panel" aria-labelledby="stockTitle">
+      <div class="section-heading">
+        <div>
+          <span class="section-heading__index">01</span>
+          <div>
+            <h2 id="stockTitle">設定小卡庫存</h2>
+            <p>輸入每位成員目前可分配的張數。</p>
+          </div>
+        </div>
+
+        <div class="stock-total">
+          <span>目前總庫存</span>
+          <strong><span id="stockTotal">0</span> 張</strong>
+        </div>
+      </div>
+
+      <div class="stock-grid" id="stockGrid"></div>
+      <div class="error" id="errorBox" role="alert"></div>
+    </section>
+
+    <section class="rule-card" aria-label="分配流程">
+      <div class="rule-card__icon">✓</div>
+      <div>
+        <strong>資料已由 customerData.js 載入</strong>
+        <p>系統依序處理指定卡、完整套組與排序散卡；散卡每輪每人最多取得 1 張。</p>
+      </div>
+      <button class="btn btn-primary" id="distributeBtn" type="button">
+        <span>開始分配</span>
+        <span aria-hidden="true">→</span>
+      </button>
+    </section>
+
+    <section class="panel result-panel" id="resultPanel" aria-labelledby="resultTitle">
+      <div class="section-heading result-heading">
+        <div>
+          <span class="section-heading__index">02</span>
+          <div>
+            <h2 id="resultTitle">分配結果</h2>
+            <p>依填單順序顯示每位客人的完整套組與額外小卡。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="summary-box" id="summaryBox"></div>
+      <div class="result-grid" id="resultGrid"></div>
+
+      <div class="remaining">
+        <div class="remaining__heading">
+          <div>
+            <span class="remaining__eyebrow">REMAINING STOCK</span>
+            <h3>剩餘庫存</h3>
+          </div>
+          <span id="remainingTotal" class="remaining__total"></span>
+        </div>
+        <div class="remaining-grid" id="remainingGrid"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="./customerData.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
