@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>娃娃多輪配貨系統 (黑/白/原皮 三款優化版)</title>
+
+    <style>
+        :root {
+            --bg: #fff8f7;
+            --surface: rgba(255, 255, 255, 0.94);
+            --surface-soft: #fff2f2;
+            --surface-warm: #fff8ee;
+            --text: #3d3034;
+            --muted: #88777c;
+            --line: #eadfe2;
+            --primary: #e8758d;
+            --primary-dark: #cf5e77;
+            --primary-soft: #ffe4e9;
+            
+            /* 三款顏色定義 */
+            --black-bg: #4a4446;
+            --black-text: #ffffff;
+            --white-bg: #f2f0f5;
+            --white-text: #524b59;
+            --original-bg: #f7ead8;
+            --original-text: #8b5a2b;
+            
+            --danger-bg: #f1f0f2;
+            --danger-text: #716a70;
+            --shadow: 0 14px 40px rgba(119, 78, 88, 0.10);
+            --shadow-hover: 0 18px 46px rgba(119, 78, 88, 0.15);
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --radius-sm: 11px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            padding: 40px 20px 64px;
+            color: var(--text);
+            background:
+                radial-gradient(circle at 8% 0%, rgba(255, 210, 219, 0.62), transparent 28%),
+                radial-gradient(circle at 96% 12%, rgba(255, 230, 194, 0.48), transparent 25%),
+                linear-gradient(180deg, #fffafa 0%, #fff7f5 45%, #fdf9f7 100%);
+            font-family: "Noto Sans TC", "Microsoft JhengHei", system-ui, -apple-system, sans-serif;
+            line-height: 1.65;
+        }
+
+        button, input {
+            font: inherit;
+        }
+
+        .container {
+            width: min(1480px, 100%);
+            margin: 0 auto;
+        }
+
+        .page-header {
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 24px;
+            padding: 34px 38px;
+            color: #fff;
+            background: linear-gradient(135deg, rgba(230, 108, 135, 0.96), rgba(210, 123, 96, 0.92));
+            border-radius: 28px;
+            box-shadow: 0 18px 50px rgba(190, 89, 111, 0.22);
+        }
+
+        .page-header h1 {
+            position: relative;
+            z-index: 1;
+            margin: 0 0 8px;
+            font-size: clamp(26px, 4vw, 42px);
+            line-height: 1.25;
+        }
+
+        .page-header p {
+            position: relative;
+            z-index: 1;
+            max-width: 760px;
+            margin: 0;
+            color: rgba(255, 255, 255, 0.88);
+            font-size: 15px;
+        }
+
+        .card {
+            margin-bottom: 22px;
+            padding: 26px;
+            background: var(--surface);
+            border: 1px solid rgba(234, 223, 226, 0.88);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(12px);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-hover);
+        }
+
+        .card h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0 0 8px;
+            color: var(--text);
+            font-size: clamp(19px, 2.3vw, 25px);
+        }
+
+        .card h2::before {
+            content: "";
+            flex: 0 0 auto;
+            width: 7px;
+            height: 24px;
+            background: linear-gradient(180deg, var(--primary), #e8ad75);
+            border-radius: 999px;
+        }
+
+        .section-description {
+            margin: 0 0 20px;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .stock-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 14px;
+            margin: 22px 0 24px;
+        }
+
+        .stock-item {
+            position: relative;
+            overflow: hidden;
+            padding: 16px;
+            background: linear-gradient(145deg, #fff, #fff7f6);
+            border: 1px solid var(--line);
+            border-radius: var(--radius-md);
+            transition: border-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .stock-item:hover {
+            transform: translateY(-2px);
+            border-color: #eab8c2;
+        }
+
+        .stock-item label {
+            display: block;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            color: #57464b;
+            border-bottom: 1px dashed #dfcfd3;
+            font-size: 19px;
+            font-weight: 800;
+        }
+
+        .stock-inputs-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        /* 3 款欄位排版 */
+        .stock-labels, .stock-inputs {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 6px;
+        }
+
+        .stock-labels {
+            padding: 0 2px;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .stock-inputs input {
+            width: 100%;
+            min-width: 0;
+            padding: 8px 4px;
+            color: var(--text);
+            background: #fff;
+            border: 1px solid #dfd2d5;
+            border-radius: 8px;
+            outline: none;
+            text-align: center;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .stock-inputs input:focus {
+            border-color: var(--primary);
+            background: #fffafb;
+            box-shadow: 0 0 0 3px rgba(232, 117, 141, 0.14);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 48px;
+            padding: 12px 24px;
+            color: #fff;
+            background: linear-gradient(135deg, var(--primary), #dc806e);
+            border: 0;
+            border-radius: 13px;
+            box-shadow: 0 10px 22px rgba(216, 92, 119, 0.22);
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 800;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            filter: saturate(1.08);
+        }
+
+        .remaining-stock {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .stock-summary-item {
+            padding: 14px 12px;
+            background: linear-gradient(145deg, #fff, var(--surface-warm));
+            border: 1px solid #eadfce;
+            border-radius: 14px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .stock-summary-item strong {
+            display: inline-flex;
+            width: 26px;
+            height: 26px;
+            margin-right: 6px;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            background: #725d63;
+            border-radius: 8px;
+        }
+
+        .table-scroll {
+            width: 100%;
+            margin-top: 18px;
+            overflow-x: auto;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+        }
+
+        table {
+            width: 100%;
+            min-width: 1000px;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: #fff;
+        }
+
+        th, td {
+            padding: 14px 16px;
+            border-right: 1px solid var(--line);
+            border-bottom: 1px solid var(--line);
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        thead th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            color: #5b474d;
+            background: #fff0f2;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .order-cell {
+            color: #9b7c83;
+            text-align: center;
+            font-weight: 800;
+        }
+
+        .customer-name {
+            color: #b64f69;
+            font-weight: 800;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            min-height: 28px;
+            margin: 3px 4px 3px 0;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* 標籤樣式 */
+        .badge-black {
+            color: var(--black-text);
+            background: var(--black-bg);
+        }
+        .badge-white {
+            color: var(--white-text);
+            background: var(--white-bg);
+            border: 1px solid #dcd7e2;
+        }
+        .badge-original {
+            color: var(--original-text);
+            background: var(--original-bg);
+        }
+        .badge-none {
+            color: var(--danger-text);
+            background: var(--danger-bg);
+        }
+
+        .stock-total-line {
+            margin-top: 10px;
+            padding-top: 8px;
+            color: var(--muted);
+            border-top: 1px dashed #dfcfd3;
+            text-align: center;
+            font-size: 13px;
+        }
+
+        .stock-total-line strong, #grandStockTotal {
+            color: var(--primary-dark);
+            font-size: 16px;
+            font-weight: 900;
+        }
+
+        @media (max-width: 1100px) {
+            .stock-grid, .remaining-stock {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+        @media (max-width: 700px) {
+            .stock-grid, .remaining-stock {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header class="page-header">
+        <h1>🖤🤍🤎 潦草娃配貨系統 (黑/白/原皮)</h1>
+        <p>依照填單順序逐輪分配，每位客人會優先取得自己選擇的款式，並盡量完成配套分配。</p>
+    </header>
+    
+    <div class="card">
+        <h2>1. 請確認或修改各款式庫存數量</h2>
+        <p class="section-description">
+            頁面已自動帶入初始庫存（黑/白/原皮）；如有調整可直接修改輸入框。
+            目前總庫存：<strong id="grandStockTotal">0</strong> 隻。
+        </p>
+        <div class="stock-grid" id="stockInputContainer"></div>
+        <button class="btn" onclick="startDistribution()">✨ 開始配貨排序</button>
+    </div>
+
+    <div class="card" id="remainingStockCard" style="display:none;">
+        <h2>結算：剩餘庫存</h2>
+        <div class="remaining-stock" id="remainingStockContainer"></div>
+    </div>
+
+    <div class="card">
+        <h2>2. 客人最終配貨結果</h2>
+        <div class="table-scroll">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 8%;">填單順序</th>
+                    <th style="width: 15%;">客人名稱</th>
+                    <th style="width: 35%;">原始購買與優先序</th>
+                    <th style="width: 42%;">最終分發到的款式結果</th>
+                </tr>
+            </thead>
+            <tbody id="resultTableBody"></tbody>
+        </table>
+        </div>
+    </div>
+</div>
+
+<script>
+// 1. 定義 8 個成員
+const members = ['燦', '旻', '彬', '辰', '城', '菲', '玟', '寅'];
+
+// =========================
+// 固定初始庫存：黑/白/原皮
+// =========================
+// 扣掉目前賣貨便1522788(原皮+KOCAㄉ8(原皮)+尖頭48SET+邱7黑+唯2白
+const initialStock = {
+    燦: { 黑:4,原皮:4,白:3 }, 
+    旻: { 黑:1,原皮:5,白:4 },
+    辰: { 黑:1,原皮:3,白:5 }, 
+    城: { 黑:3,原皮:5,白:4 }, 
+    菲: { 黑:5,原皮:2,白:8 }, 
+    玟: { 黑:4,原皮:2,白:4 }, 
+    寅: { 黑:0,原皮:4,白:2 } 
+}; 
+
+
+// 2. 客人資料測試範例 (可依需求調整 prefs 優先序)
+const customersData = [
+    { id: 1, name: "Yunen Lin", demands: { '菲': 3 }, prefs: { '菲': ['黑', '白', '原皮'] } },
+    { id: 2, name: "Mini.", demands: { '辰': 3, '城': 3 }, prefs: { '辰': ['黑', '白', '原皮'], '城': ['黑', '白', '原皮'] } },
+    { id: 3, name: "蕃茄金針菇", demands: { '旻': 3, '城': 3 }, prefs: { '旻': ['黑', '白', '原皮'], '城': ['黑', '白', '原皮'] } },
+    { id: 4, name: "禹", demands: { '菲': 3 }, prefs: { '菲': ['黑', '白', '原皮'] } },
+    { id: 5, name: "Winnie", demands: { '菲': 2 }, prefs: { '菲': ['白', '黑', '原皮'] } },
+    // 杜小雯🐣 備註為「128不拆」，如需指定成員可在此處加上 demand 與 prefs
+    // { id: 6, name: "杜小雯🐣", demands: {}, prefs: {} },
+    { id: 7, name: "Xuan Nv", demands: { '菲': 2, '玟': 1 }, prefs: { '菲': ['原皮', '白', '黑'], '玟': ['白', '原皮', '黑'] } },
+    { id: 8, name: "謝小雨", demands: { '燦': 1, '城': 1 }, prefs: { '燦': ['黑', '白', '原皮'], '城': ['白', '黑', '原皮'] } },
+    { id: 9, name: "Skzoo.hsuani", demands: { '旻': 1, '城': 1 }, prefs: { '旻': ['原皮', '白', '黑'], '城': ['原皮', '白', '黑'] } },
+    { id: 10, name: "77", demands: { '旻': 3 }, prefs: { '旻': ['黑', '白', '原皮'] } },
+    { id: 11, name: "陳*檸", demands: { '玟': 1 }, prefs: { '玟': ['白', '黑', '原皮'] } },
+    { id: 12, name: "李*鈺", demands: { '玟': 1 }, prefs: { '玟': ['白', '黑', '原皮'] } }
+];
+
+function initStockUI() {
+    const container = document.getElementById('stockInputContainer');
+    container.innerHTML = '';
+
+    members.forEach(member => {
+        const stock = initialStock[member] || { 黑: 0, 白: 0, 原皮: 0 };
+
+        const div = document.createElement('div');
+        div.className = 'stock-item';
+
+        div.innerHTML = `
+            <label>${member}</label>
+            <div class="stock-inputs-wrapper">
+                <div class="stock-labels">
+                    <span>🖤黑</span>
+                    <span>🤍白</span>
+                    <span>🤎原</span>
+                </div>
+                <div class="stock-inputs">
+                    <input type="number" id="stock_${member}_黑" min="0" value="${stock.黑}" oninput="updateMemberStockTotal('${member}')">
+                    <input type="number" id="stock_${member}_白" min="0" value="${stock.白}" oninput="updateMemberStockTotal('${member}')">
+                    <input type="number" id="stock_${member}_原皮" min="0" value="${stock.原皮}" oninput="updateMemberStockTotal('${member}')">
+                </div>
+                <div class="stock-total-line">
+                    合計：<strong id="stock_total_${member}">${stock.黑 + stock.白 + stock.原皮}</strong> 隻
+                </div>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+
+    updateGrandStockTotal();
+}
+
+function updateMemberStockTotal(member) {
+    const black = parseInt(document.getElementById(`stock_${member}_黑`).value, 10) || 0;
+    const white = parseInt(document.getElementById(`stock_${member}_白`).value, 10) || 0;
+    const original = parseInt(document.getElementById(`stock_${member}_原皮`).value, 10) || 0;
+
+    document.getElementById(`stock_total_${member}`).textContent = black + white + original;
+    updateGrandStockTotal();
+}
+
+function updateGrandStockTotal() {
+    const total = members.reduce((sum, member) => {
+        const black = parseInt(document.getElementById(`stock_${member}_黑`)?.value, 10) || 0;
+        const white = parseInt(document.getElementById(`stock_${member}_白`)?.value, 10) || 0;
+        const original = parseInt(document.getElementById(`stock_${member}_原皮`)?.value, 10) || 0;
+        return sum + black + white + original;
+    }, 0);
+
+    const totalElement = document.getElementById('grandStockTotal');
+    if (totalElement) totalElement.textContent = total;
+}
+
+function startDistribution() {
+    let stock = {};
+    for (const m of members) {
+        const black = Number(document.getElementById(`stock_${m}_黑`).value);
+        const white = Number(document.getElementById(`stock_${m}_白`).value);
+        const original = Number(document.getElementById(`stock_${m}_原皮`).value);
+
+        if (black < 0 || white < 0 || original < 0) {
+            alert(`${m}的庫存必須是 0 以上的整數`);
+            return;
+        }
+
+        stock[m] = { 黑: black, 白: white, 原皮: original };
+    }
+
+    let results = {};
+    let currentDemands = {};
+    let historyOfAllocatedStyles = {}; 
+    
+    customersData.forEach(c => {
+        results[c.id] = [];
+        currentDemands[c.id] = { ...c.demands };
+        historyOfAllocatedStyles[c.id] = {};
+        members.forEach(m => {
+            historyOfAllocatedStyles[c.id][m] = [];
+        });
+    });
+
+    const maxRounds = 5;
+    
+    for (let round = 1; round <= maxRounds; round++) {
+        let anyDistributionInThisRound = false;
+
+        customersData.forEach(customer => {
+            const cId = customer.id;
+            
+            members.forEach(m => {
+                if (currentDemands[cId][m] && currentDemands[cId][m] > 0) {
+                    const prefOrder = customer.prefs[m] || ['黑', '白', '原皮'];
+                    let allocatedStyle = null;
+
+                    // 優先分發沒拿過的款式 (實現配套)
+                    for (let style of prefOrder) {
+                        if (!historyOfAllocatedStyles[cId][m].includes(style) && stock[m][style] > 0) {
+                            allocatedStyle = style;
+                            break;
+                        }
+                    }
+
+                    // 保底分發（若未拿過的沒庫存，才給重複款式）
+                    if (!allocatedStyle) {
+                        for (let style of prefOrder) {
+                            if (stock[m][style] > 0) {
+                                allocatedStyle = style;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (allocatedStyle) {
+                        stock[m][allocatedStyle]--;
+                        results[cId].push({ member: m, style: allocatedStyle, status: '成功' });
+                        historyOfAllocatedStyles[cId][m].push(allocatedStyle);
+                    } else {
+                        results[cId].push({ member: m, style: '均無庫存', status: '斷貨' });
+                    }
+
+                    currentDemands[cId][m]--;
+                    anyDistributionInThisRound = true;
+                }
+            });
+        });
+
+        if (!anyDistributionInThisRound) break;
+    }
+
+    renderResults(results, stock);
+}
+
+function renderResults(results, remainingStock) {
+    document.getElementById('remainingStockCard').style.display = 'block';
+    const stockContainer = document.getElementById('remainingStockContainer');
+    stockContainer.innerHTML = '';
+    
+    members.forEach(m => {
+        stockContainer.innerHTML += `
+            <div class="stock-summary-item">
+                <strong>${m}</strong><br>
+                黑剩 <b>${remainingStock[m]['黑']}</b>｜
+                白剩 <b>${remainingStock[m]['白']}</b>｜
+                原皮剩 <b>${remainingStock[m]['原皮']}</b>
+            </div>
+        `;
+    });
+
+    const tbody = document.getElementById('resultTableBody');
+    tbody.innerHTML = '';
+
+    customersData.forEach(c => {
+        const tr = document.createElement('tr');
+        
+        let demandStr = [];
+        for (let m in c.demands) {
+            const prefTxt = (c.prefs[m] || ['黑', '白', '原皮']).join('>');
+            demandStr.push(`${m} x ${c.demands[m]} (${prefTxt})`);
+        }
+
+        let resultBadges = [];
+        const myResults = results[c.id];
+        
+        if (myResults.length === 0) {
+            resultBadges.push(`<span class="badge badge-none">無購買需求</span>`);
+        } else {
+            myResults.forEach(res => {
+                if (res.status === '斷貨') {
+                    resultBadges.push(`<span class="badge badge-none">${res.member}(缺貨)</span>`);
+                } else {
+                    let bgClass = 'badge-original';
+                    if (res.style === '黑') bgClass = 'badge-black';
+                    if (res.style === '白') bgClass = 'badge-white';
+                    
+                    resultBadges.push(`<span class="badge ${bgClass}">${res.member}(${res.style})</span>`);
+                }
+            });
+        }
+
+        tr.innerHTML = `
+            <td class="order-cell">${c.id}</td>
+            <td class="customer-name">${c.name}</td>
+            <td class="demand-text">${demandStr.join('、')}</td>
+            <td>${resultBadges.join(' ')}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+window.onload = initStockUI;
+</script>
+
+</body>
+</html>

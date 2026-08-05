@@ -1,4 +1,5 @@
 const initialStock = {
+<<<<<<< HEAD
   燦: 87,
   旻: 87,
   彬: 87,
@@ -12,6 +13,16 @@ const initialStock = {
   玟: 92,
   寅: 92
 >>>>>>> 0b15c85 (072111)
+=======
+  燦: 21,
+  旻: 29,
+  彬: 15,
+  辰: 32,
+  城: 40,
+  菲: 31,
+  玟: 45,
+  寅: 55
+>>>>>>> 948bef4 (0806666)
 };
 
 const FULL_SET_MEMBERS = Object.keys(initialStock);
